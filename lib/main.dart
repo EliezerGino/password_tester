@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:password_tester/constants.dart';
-import 'Blocs/password.tester.bloc.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,7 +33,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController textFieldController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  String passwordResult = "Resutado";
+
+  Color colorTrue;
+
+  validarDados(textFieldController) {
+    String senha = textFieldController.text;
+    int forca = 0;
+
+    if ((senha.length >= 4) && (senha.length <= 7)) {
+      forca += 10;
+    } else if (senha.length > 7) {
+      forca += 25;
+    }
+    if ((senha.length >= 5) && (senha.contains(new RegExp(r'[a-z]')))) {
+      forca += 10;
+    }
+    if ((senha.length >= 6) && (senha.contains(new RegExp(r'[A-Z]')))) {
+      forca += 20;
+    }
+    if ((senha.length >= 5) && (senha.contains(new RegExp(r'[@#$%^&*_]')))) {
+      forca += 25;
+    }
+
+    mostrarFoorca(forca);
+  }
+
+  mostrarFoorca(forca) {
+    setState(() {
+      if (forca < 30) {
+        passwordResult = "Senha Fraca";
+      } else if ((forca >= 30) && (forca < 50)) {
+        passwordResult = 'Senha Media';
+      } else if ((forca >= 50) && (forca < 70)) {
+        passwordResult = 'Senha Forte';
+      } else if ((forca >= 70) && (forca < 100)) {
+        passwordResult = 'Senha Exelente';
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       child: TextField(
-                        controller: textFieldController,
+                        controller: passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
                             hintText: "Password",
@@ -168,15 +207,46 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: FlatButton(
                           onPressed: () {
-                            validarDados(textFieldController);
+                            validarDados(passwordController);
                           },
                           child: Text(
                             "Testar Senha",
-                            style: TextStyle(color: kWhite),
+                            style: TextStyle(
+                                color: kWhite, fontWeight: FontWeight.w400),
                           ),
                         ),
                       ),
-                    )
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Align(
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: 44,
+                        width: 44,
+                        decoration: BoxDecoration(
+                          color: kWhite,
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(
+                              offset: Offset(3, 0),
+                              blurRadius: 15,
+                              spreadRadius: -5,
+                              color: kCinnabar.withAlpha(99),
+                            )
+                          ],
+                        ),
+                        child: SvgPicture.asset(
+                          "assets/icons/logo.svg",
+                          color: kOrange,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(passwordResult)
                   ],
                 ),
               ),
